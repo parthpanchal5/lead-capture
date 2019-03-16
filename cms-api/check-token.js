@@ -6,8 +6,13 @@ module.exports={
   ensureAuthorized: (_req,_res, _next)=>{
       //console.log("auth token : ",req.headers.authorization);
       let authorization=[];
-      if(_req.headers.authorization){
-          authorization = _req.headers.authorization.split(" ");
+      if(_req.headers.authorization || _req.query.auth){
+          if(_req.headers.authorization){
+            authorization = _req.headers.authorization.split(" ");
+          } else {
+            authorization = _req.query.auth.split(" ");
+          }
+          
           // console.log(authorization[1]);
           if(authorization[0] == 'Bearer'){
               db.executeSql("select t.id as token_id, u.* from token as t inner join admin as u on u.id = t.admin_id  where t.token = '"+authorization[1]+"'",(err1,data1)=>{

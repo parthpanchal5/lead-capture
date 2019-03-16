@@ -8,12 +8,12 @@ module.exports = (_app) => {
   // Get all campaigns
   _app.get('/campaigns', CT.ensureAuthorized, (_req, _res) => {
     var filterSql = (_req.query.name) ? ' WHERE campaign_name LIKE "%' + _req.query.name + '%"' : '';
-    db.executeSql("SELECT * FROM campaign"+ filterSql,(_err,_data) => {
+    db.executeSql("SELECT * FROM campaign WHERE NOT status = -1"+ filterSql,(_err,_data) => {
       if(_err){
         httpMsg.show500(_req, _res, _err);
       } else {
         if(_data && _data.length > 0){
-          httpMsg.sendJson(_req, _res, { status:true, message:"Successful", data: _data });
+          httpMsg.sendJson(_req, _res, { status:true, message:"Successfully", data: _data });
         } else {
           httpMsg.sendJson(_req, _res, { status:false, message:"Fail", data:[] });
         }
@@ -32,7 +32,7 @@ module.exports = (_app) => {
           httpMsg.show500(_req, _res, _err);
         } else {
           if(_data && _data.length > 0){
-            httpMsg.sendJson(_req, _res, { status:true, message:"Successful", data:_data[0] });
+            httpMsg.sendJson(_req, _res, { status:true, message:"Successfully", data:_data[0] });
           } else {
             httpMsg.sendJson(_req, _res, { status:false, message:"Fail", data:{} });
           }
@@ -84,13 +84,13 @@ module.exports = (_app) => {
         if(_err){
           httpMsg.show500(_req, _res, _err);
         } else {
-          httpMsg.sendJson(_req, _res, { status:true, message:"Successful"});
+          httpMsg.sendJson(_req, _res, { status:true, message:"Successfully"});
         }
       });
     }
   });
 
-  _app.put('/campaign/:id/status/:status', (_req, _res) => {
+  _app.get('/campaign/:id/status/:status', (_req, _res) => {
     const id = (_req.params.id) ? _req.params.id : '';
     const status = (_req.params.status) ? _req.params.status : 1;
     if(id == ''){
@@ -101,7 +101,7 @@ module.exports = (_app) => {
         if(_err){
           httpMsg.show500(_req, _res, _err);
         } else {
-          httpMsg.sendJson(_req, _res, { status:true, message: "Successful" });
+          httpMsg.sendJson(_req, _res, { status:true, message: "Successfully" });
         }
       });
     }

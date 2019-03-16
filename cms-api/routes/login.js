@@ -7,9 +7,10 @@ const randomstring = require('randomstring');
 
 module.exports = (_app) => {
 
-  // Get all campaigns
-  _app.post('/login', (_req, _res) => {
-    const email = CF.isset(_req.body.email)? _req.body.email : '';
+  	// Get all campaigns
+  	_app.post('/login', (_req, _res) => {
+  		console.log("body : ",_req.body)
+    	const email = CF.isset(_req.body.email)? _req.body.email : '';
 		const password = CF.isset(_req.body.password)? _req.body.password : '';
 		if(email == '' || password == ''){
 			httpMsg.show400(_req, _res, "Parameter is missing", "JSON");

@@ -94,4 +94,21 @@ module.exports = (_app) => {
       });
     }
   });
+
+  _app.get('/user/:id/status/:status', (_req, _res) => {
+    const id = (_req.params.id) ? _req.params.id : '';
+    const status = (_req.params.status) ? _req.params.status : 1;
+    if(id == ''){
+      httpMsg.show403(_req, _res, "Id is missing");
+    } else {
+      db.executeSql("UPDATE users SET status = '"+status+"', updated_on = now() WHERE id = '" + _req.params.id + "'", (_err, _data) => {
+        console.log('Status Updated', _data);
+        if(_err){
+          httpMsg.show500(_req, _res, _err);
+        } else {
+          httpMsg.sendJson(_req, _res, { status:true, message: "Successful" });
+        }
+      });
+    }
+  });
 } 

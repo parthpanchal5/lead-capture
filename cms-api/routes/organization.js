@@ -7,8 +7,8 @@ module.exports = (_app) => {
 
   // All Data
   _app.get('/organizations', CT.ensureAuthorized, (_req, _res) => {
-    var filterSql = (_req.query.name) ? ' and org_name LIKE "% ' + _req.query.name + '%"' : '';
-    db.executeSql("SELECT * FROM organization where not status = -1" + filterSql+" order by inserted_on desc", (_err,_data) => {
+    var filterSql = (_req.query.name) ? ' and o.org_name LIKE "% ' + _req.query.name + '%"' : '';
+    db.executeSql("SELECT o.*, (SELECT COUNT(c.id) FROM campaign AS c WHERE NOT c.status = -1 AND NOT c.status= 0 AND c.org_id = o.id) AS campaigns  FROM organization as o where not o.status = -1" + filterSql+" order by o.inserted_on desc", (_err,_data) => {
       if(_err){
         httpMsg.show500(_req, _res, _err);
       } else {
@@ -50,7 +50,7 @@ module.exports = (_app) => {
       "admin_id" : (_req.body.admin_id)?_req.body.admin_id:0,
       "admins_id" : (_req.body.admins_id)?_req.body.admins_id:1,
       "status" : (_req.body.status)?_req.body.status:1,
-      "ip" : CF.getIp(_req)
+      "ip" : CF.getIp(_req) 
     }
     let sql = '';
     let msg = '';
@@ -88,12 +88,12 @@ module.exports = (_app) => {
   });
 
   
-  _app.put('/organization/:id/status/:status', (_req, _res) => {
+  _app.get('/organization/:id/status/:status', (_req, _res) => {
     const id = (_req.params.id) ? _req.params.id : '';
     const status = (_req.params.status) ? _req.params.status : 1;
     if(id == ''){
       httpMsg.show403(_req, _res, "Id is missing");
-    } else {
+    } else {  
       db.executeSql("UPDATE organization SET status = '"+status+"', updated_on = now() WHERE id = '" + _req.params.id + "'", (_err, _data) => {
         console.log('Status Updated', _data);
         if(_err){

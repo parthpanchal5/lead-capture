@@ -6,7 +6,7 @@ const CT = require('./../check-token');
 module.exports = (_app) => {
 
   // All data
-  _app.get('/profiles' ,CT.ensureAuthorized, (_req, _res) => {
+  _app.get('/profile' ,CT.ensureAuthorized, (_req, _res) => {
     httpMsg.sendJson(_req, _res, { status:true, message:"Successful", data:_req.userData });
   });
 

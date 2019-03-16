@@ -12,9 +12,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, }));
 app.use(multiParty());
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Methods', 'OPTIONS,GET,POST,PUT,DELETE');
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+    // if ('OPTIONS' == req.method){
+    //     return res.send(200);
+    // }
+    next();
+});
 
 var cmsApi = express.Router();
 require("./cms-api/config")(cmsApi);
-app.use(cmsApi);
+app.use('/cms-api', cmsApi);
 
 app.listen(config.port, () => console.log(`${config.dbConfig.database} listening on port ${config.port} Successfully`));
