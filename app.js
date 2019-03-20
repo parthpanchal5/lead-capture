@@ -12,6 +12,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, }));
 app.use(multiParty());
 
+// Template engine
+app.set('views', path.join(__dirname, 'clients'));
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header('Access-Control-Allow-Methods', 'OPTIONS,GET,POST,PUT,DELETE');
@@ -22,8 +27,14 @@ app.use(function(req, res, next) {
     next();
 });
 
+// Folder Redirection for ejs template engine
+const clients = express.Router();
+require('./clients/config')(clients);
+app.use(clients);
+
 var cmsApi = express.Router();
 require("./cms-api/config")(cmsApi);
+
 app.use('/cms-api', cmsApi);
 
 app.listen(config.port, () => console.log(`${config.dbConfig.database} listening on port ${config.port} Successfully`));
