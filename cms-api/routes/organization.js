@@ -7,18 +7,41 @@ module.exports = (_app) => {
 
   // All Data
   _app.get('/organizations', CT.ensureAuthorized, (_req, _res) => {
+
+    result = {};
+    result.page = parseInt(CF.isset(_req.query.page)?_req.query.page:1);
+    result.limit = parseInt(CF.isset(_req.query.limit)?_req.query.limit:10);
+    var skip = (result.page-1)* result.limit;
+    var SQLLimit = skip + ',' + result.limit;
+
     var filterSql = (_req.query.name) ? ' and o.org_name LIKE "% ' + _req.query.name + '%"' : '';
-    db.executeSql("SELECT o.*, (SELECT COUNT(c.id) FROM campaign AS c WHERE NOT c.status = -1 AND NOT c.status= 0 AND c.org_id = o.id) AS campaigns  FROM organization as o where not o.status = -1" + filterSql+" order by o.inserted_on desc", (_err,_data) => {
-      if(_err){
-        httpMsg.show500(_req, _res, _err);
+
+    db.executeSql("SELECT count(o.id) as total FROM organization as o where not o.status = -1" + filterSql,(_errT, _dataT) => {
+      if(_errT){
+        httpMsg.show500(_req, _res, _errT);
       } else {
-        if(_data && _data.length > 0){
-          httpMsg.sendJson(_req, _res, { status:true, message:"Successful", data:_data });
+        if(_dataT && _dataT.length > 0){
+          result.total = _dataT[0].total;
+          result.pages = Math.ceil(result.total / result.limit);
         } else {
-          httpMsg.sendJson(_req, _res, { status:false, message:"Failed", data:[] });
+          result.total = 0;
+          result.pages = 0; 
         }
+        db.executeSql("SELECT o.*, (SELECT COUNT(c.id) FROM campaign AS c WHERE NOT c.status = -1 AND NOT c.status= 0 AND c.org_id = o.id) AS campaigns, (SELECT COUNT(p.id) FROM posts AS p WHERE NOT p.status = -1 AND NOT p.status= 0 AND p.org_id = o.id) AS posts FROM organization as o where not o.status = -1" + filterSql+" order by o.inserted_on desc limit " +SQLLimit, (_err,_data) => {
+          if(_err){
+            httpMsg.show500(_req, _res, _err);
+          } else {
+            if(_data && _data.length > 0){
+              result.docs=_data;
+            } else {
+              result.docs=[];
+            }
+            httpMsg.sendJson(_req, _res, { status:true, message:"Successful", data:result });
+          }
+        });
       }
-    });
+    })
+    
   });
 
   // Specific data with id

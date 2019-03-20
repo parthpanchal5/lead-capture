@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const path = require('path');
 const multiParty = require('connect-multiparty'); 
-
+const ejs = require('ejs');
 const app = express();
 
 app.use(morgan('dev'));
