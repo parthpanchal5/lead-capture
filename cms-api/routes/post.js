@@ -65,7 +65,7 @@ module.exports = (_app) => {
 		}
 	});
 
-	// Specific data
+	// get data for copy link
 	_app.get('/post-link/:id', CT.ensureAuthorized, (_req, _res) => {
 		var id = (_req.params.id) ? _req.params.id : '';
 		if(id == ''){
@@ -95,7 +95,7 @@ module.exports = (_app) => {
 	_app.post('/post', CT.ensureAuthorized, (_req, _res) => {
 		const id = (_req.body.id)?_req.body.id:'';
 		const post = {
-			"campaign_id": (_req.body.campaign_id)?_req.body.campaign_id:2,
+			"campaign_id": (_req.body.campaign_id)?_req.body.campaign_id:1,
 			"title": (_req.body.title)?_req.body.title:'',
 			"post_desc": (_req.body.post_desc)?_req.body.post_desc:'',
 			"posted_on": (_req.body.posted_on)?_req.body.posted_on:'',
@@ -124,7 +124,7 @@ module.exports = (_app) => {
 						msg = "Inserted Successfully";
 						console.log("SQL: ", sql);
 					}else{
-						sql = "UPDATE posts SET title = '"+_req.body.title+"', post_desc = '"+_req.body.post_desc+"', posted_on = now(), post_type = '"+_req.body.post_type+"', post_content = '"+_req.body.post_content+"', remark = '"+_req.body.remark+"' WHERE id  = '"+id+"'";
+						sql = "UPDATE posts SET title = '"+_req.body.title+"', post_desc = '"+_req.body.post_desc+"', posted_on = now(), post_type = '"+_req.body.post_type+"', post_content = '"+_req.body.post_content+"', remark = '"+_req.body.remark+"', track_id = '"+_req.body.track_id+"' WHERE id  = '"+id+"'";
 						msg = "Updated Successfully";  
 						console.log("SQL: ", sql);
 

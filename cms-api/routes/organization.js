@@ -27,7 +27,7 @@ module.exports = (_app) => {
           result.total = 0;
           result.pages = 0; 
         }
-        db.executeSql("SELECT o.*, (SELECT COUNT(c.id) FROM campaign AS c WHERE NOT c.status = -1 AND NOT c.status= 0 AND c.org_id = o.id) AS campaigns, (SELECT COUNT(p.id) FROM posts AS p WHERE NOT p.status = -1 AND NOT p.status= 0 AND p.org_id = o.id) AS posts FROM organization as o where not o.status = -1" + filterSql+" order by o.inserted_on desc limit " +SQLLimit, (_err,_data) => {
+        db.executeSql("SELECT o.*, (SELECT COUNT(c.id) FROM campaign AS c WHERE NOT c.status = -1 AND NOT c.status= 0 AND c.org_id = o.id) AS campaigns, (SELECT COUNT(p.id) FROM posts AS p WHERE NOT p.status = -1 AND NOT p.status = 0 AND p.org_id = o.id) AS posts FROM organization as o where not o.status = -1" + filterSql+" order by o.inserted_on desc limit " +SQLLimit, (_err,_data) => {
           if(_err){
             httpMsg.show500(_req, _res, _err);
           } else {
@@ -44,24 +44,26 @@ module.exports = (_app) => {
     
   });
 
+
+
   // Specific data with id
   _app.get('/organization/:id', CT.ensureAuthorized, (_req, _res) => {
+    var result = {};
     var id = (_req.params.id) ? _req.params.id : '';
     if(id == ''){
-      httpMsg.show403(_req, _res, "Id is missing");
-    } else {
-      db.executeSql("SELECT * FROM organization WHERE id = '" + _req.params.id + "'", (_err, _data) => {
-        if(_err){
-          httpMsg.show500(_req, _res, _err);
+      return httpMsg.show403(_req, _res, "Id is missing");
+    } 
+    db.executeSql("SELECT * FROM organization WHERE id = '" + _req.params.id + "'", (_err, _data) => {
+      if(_err){ 
+        httpMsg.show500(_req, _res, _err, "JSON");
+      } else {
+        if(_data && _data.length > 0){
+          httpMsg.sendJson(_req, _res, {status: true, message: 'Successfully Displayed', data: _data[0]});
         } else {
-          if(_data && _data.length > 0){
-            httpMsg.sendJson(_req, _res, { status:true, message:"Successful", data:_data[0] });
-          } else {
-            httpMsg.sendJson(_req, _res, { status:false, message:"Failed", data:{ } });
-          }
+          httpMsg.sendJson(_req, _res, {status: true, message: 'Successfully Displayed', data: {}});
         }
-      });
-    }
+      } 
+    }) 
   });
 
   // Insert in table

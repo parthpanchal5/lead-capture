@@ -16,6 +16,7 @@
     "morgan": "^1.9.1",
     "multiparty": "^4.2.1",
     "mysql": "^2.16.0",
-    "randomstring": "^1.1.5"
+    "randomstring": "^1.1.5",
+    "sync-watch": "^1.0.4"
   }
 }

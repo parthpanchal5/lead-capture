@@ -164,6 +164,7 @@ exports.abbrNum = function(number, decPlaces) {
 	}
 	return number;
 }
+
 exports.numAbbr =  function(number) {
 	var abbrev = [{"label":"K","value":1000},{"label":"Lac","value":100000},{"label":"Cr","value":10000000}];
 	for (var i=abbrev.length-1; i>=0; i--) {
@@ -174,6 +175,7 @@ exports.numAbbr =  function(number) {
 	}
 	return number;
 }
+
 exports.fullPath =  function(_req,_path) {
 	return (((_req.connection && _req.connection.encrypted)?'https' : 'http')+"://"+_req.get('host')+_path);
 }

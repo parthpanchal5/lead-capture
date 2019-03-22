@@ -2,6 +2,7 @@ const httpMsg = require('./../../core/httpMsg');
 const db = require("./../../core/db");
 const CF = require('./../../core/commonFun');
 const CT = require('./../check-token');
+const SW = require('sync-watch');
 
 module.exports = (_app) => {
 
@@ -27,17 +28,16 @@ module.exports = (_app) => {
           result.total = 0;
           result.pages = 0; 
         }
-        console.log("SELECT c.* FROM campaign AS c where not c.status=0 and not c.status=-1"+filterSql+" limit " +SQLLimit)
-        db.executeSql("SELECT c.* FROM campaign AS c where not c.status=0 and not c.status=-1"+filterSql+" limit " +SQLLimit, (_err, _data) => {
+        // console.log("SELECT c.* FROM campaign AS c where not c.status=0 and not c.status=-1"+filterSql+" limit " +SQLLimit);
+        db.executeSql("SELECT c.*, (SELECT COUNT(p.id) FROM posts AS p WHERE NOT p.status = -1 AND NOT p.status = 0 AND p.campaign_id = c.id) AS posts FROM campaign as c where not c.status = -1"+filterSql+" order by c.inserted_on desc limit " +SQLLimit, (_err, _data) => {
           if(_err) {
             httpMsg.show500(_req, _res, _err);
           } else {
-            if(_data && _data.length > 0) {
-              result.docs = _data;
-              // console.log(result.docs);
-            } else {
-              result.docs = [];
-            }
+              if(_data && _data.length > 0) {
+                result.docs = _data;
+              } else {
+                result.docs = [];
+              }
             httpMsg.sendJson(_req, _res, { status: true, message: 'Successful', data:result });
           }
         });
@@ -45,24 +45,42 @@ module.exports = (_app) => {
     });
   });
 
-  // Get specific campaign
+  // For Drop-down and updating results
   _app.get('/campaign/:id', CT.ensureAuthorized, (_req, _res) => {
-    var id = (_req.params.id) ? _req.params.id : '';
-    if(id == ''){
-      httpMsg.show403(_req, _res, "Id is missing");
+    var sw = new SW();
+    var result = {};
+    var id = (_req.params.id) ? _req.params.id : '0';
+    if(id == '0') {
+      result.campaign = {};
     } else {
-      db.executeSql("SELECT * FROM campaign where id = '" + _req.params.id + "'", (_err, _data) => {
-        if(_err){
-          httpMsg.show500(_req, _res, _err);
-        } else {
+      sw.Sync("campaign", (_rcb) => db.executeSql("SELECT * FROM campaign WHERE id = '" + _req.params.id + "'", _rcb), (_err, _data) => {
+        if(!_err){
           if(_data && _data.length > 0){
-            httpMsg.sendJson(_req, _res, { status:true, message:"Successfully", data:_data[0] });
+            result.campaign = _data[0];
           } else {
-            httpMsg.sendJson(_req, _res, { status:false, message:"Fail", data:{} });
+            result.campaign = {};
           }
-        }
-      });
+          return true;
+        } 
+      }); 
     }
+    sw.Sync("orgdrop", (_rcb) => db.executeSql("SELECT id, org_name FROM organization WHERE NOT status = -1 OR NOT status = 0", _rcb), (_err, _data) => {
+      if(!_err) {
+        if(_data && _data.length > 0) {
+          result.organizations = _data;
+        } else {
+          result.organizations = [];
+        }
+        return true;
+      }
+    });
+    sw.Watch((_err) => {
+      if(!_err) {
+        httpMsg.sendJson(_req, _res, {status: true, message: 'Successfully Displayed', data: result});
+      } else {
+        httpMsg.show500(_req, _res, _err, "JSON");
+      }
+    });
   });
   
 
