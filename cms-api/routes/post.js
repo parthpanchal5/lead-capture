@@ -2,6 +2,7 @@ const httpMsg = require('./../../core/httpMsg');
 const db = require("./../../core/db");
 const CF = require('./../../core/commonFun');
 const CT = require('./../check-token');
+const SW = require('sync-watch');
 
 module.exports = (_app) => {
 
@@ -45,24 +46,52 @@ module.exports = (_app) => {
 		});
 	});
 
-	// Specific data
+	// For Drop-down and updating results
 	_app.get('/post/:id', CT.ensureAuthorized, (_req, _res) => {
-		var id = (_req.params.id) ? _req.params.id : '';
-		if(id == ''){
-			httpMsg.show403(_req, _res, "ID is missing");
+		var sw = new SW();
+    var result = {};		
+		var id = (_req.params.id) ? _req.params.id : '0';
+		if(id == '0') {
+      result.post = {};
 		} else {
-			db.executeSql("SELECT * FROM posts WHERE id = '"+ _req.params.id +"'", (_err, _data) => {
-				if(_err){
-					httpMsg.show500(_req, _res, _err);
-				} else {
-						if(_data && _data.length > 0){
-							httpMsg.sendJson(_req, _res, { status:true, message:"Successfully", data:_data[0] });
-						} else {
-							httpMsg.sendJson(_req, _res, { status:false, message:"Fail", data:{} });
-						}
+			sw.Sync("post", (_rcb) => 	db.executeSql("SELECT * FROM posts WHERE id = '"+ _req.params.id +"'", _rcb), (_err, _data) => {
+				if(!_err){
+          if(_data && _data.length > 0){
+						result.post = _data[0];
+					} else {
+						result.post = {};
 					}
-			});
+					return true;
+				}
+			}); 
 		}
+		sw.Sync("orgdrop", (_rcb) => db.executeSql("SELECT id, org_name FROM organization WHERE NOT status = -1 OR NOT status = 0", _rcb), (_err, _data) => {
+			if(!_err) {
+				if(_data && _data.length > 0) {
+					result.organizations = _data;
+				} else {
+					result.organizations = [];
+				}
+				return true;
+			}
+		});
+		sw.Sync("campdrop", (_rcb) => db.executeSql("SELECT id, title FROM campaign WHERE NOT status = -1 OR NOT status = 0", _rcb), (_err, _data) => {
+			if(!_err) {
+				if(_data && _data.length > 0) {
+					result.organizations = _data;
+				} else {
+					result.organizations = [];
+				}
+				return true;
+			}
+		});
+		sw.Watch((_err) => {
+			if(!_err) {
+				httpMsg.sendJson(_req, _res, {status: true, message: 'Successfully Displayed', data: result});
+			} else {
+				httpMsg.show500(_req, _res, _err, "JSON");
+			}
+		});
 	});
 
 	// get data for copy link
