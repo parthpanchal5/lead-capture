@@ -75,7 +75,7 @@ module.exports = (_app) => {
 				return true;
 			}
 		});
-		sw.Sync("campdrop", (_rcb) => db.executeSql("SELECT id, title FROM campaign WHERE NOT status = -1 OR NOT status = 0", _rcb), (_err, _data) => {
+		sw.Sync("campdrop", (_rcb) => db.executeSql("SELECT c.id, c.title FROM campaign as c inner join posts on c.id = posts.campaign_id WHERE NOT c.status = -1 OR NOT c.status = 0", _rcb), (_err, _data) => {
 			if(!_err) {
 				if(_data && _data.length > 0) {
 					result.organizations = _data;
