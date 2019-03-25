@@ -40,9 +40,9 @@ exports.show404 = (_req, _res ,_err, _type) => {
 // 400: Bad Request => {  The server cannot or will not process the request due to something that is understand to be a client error }
 exports.show400 = (_req,_res,_err, _type) => {
 	const result = {
-		title : "Bad _reques",
+		title : "Bad request",
 		hStatus : 400,
-		error: "Bad _request. Invalid input parameters",
+		error: "Bad request. Invalid input parameters",
 		message: _err,
 	};
 	if(_type === "HTML"){
