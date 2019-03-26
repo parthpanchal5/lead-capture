@@ -17,7 +17,7 @@ module.exports = (_app) => {
 
     var filterSql = (_req.query.title) ? ' and c.title LIKE "%' + _req.query.title + '%"' : '';
     filterSql += (_req.query.org_id) ? ' and c.org_id = "' + _req.query.org_id + '"' : '';
-    db.executeSql("SELECT count(c.id) AS total FROM campaign AS c WHERE NOT c.status= -1 and c.status=0"+ filterSql,(_errT,_dataT) => {
+    db.executeSql("SELECT count(c.id) AS total FROM campaign AS c WHERE NOT c.status= -1 and not c.status=0"+ filterSql,(_errT,_dataT) => {
       if(_errT){  
         httpMsg.show500(_req, _res, _errT);
       } else {
@@ -28,8 +28,10 @@ module.exports = (_app) => {
           result.total = 0;
           result.pages = 0; 
         }
+        var sql = "SELECT c.*, (SELECT COUNT(p.id) FROM posts AS p WHERE NOT p.status = -1 AND NOT p.status = 0 AND p.campaign_id = c.id) AS posts FROM campaign as c where not c.status = -1"+filterSql+" order by c.inserted_on desc limit " +SQLLimit;
         // console.log("SELECT c.* FROM campaign AS c where not c.status=0 and not c.status=-1"+filterSql+" limit " +SQLLimit);
-        db.executeSql("SELECT c.*, (SELECT COUNT(p.id) FROM posts AS p WHERE NOT p.status = -1 AND NOT p.status = 0 AND p.campaign_id = c.id) AS posts FROM campaign as c where not c.status = -1"+filterSql+" order by c.inserted_on desc limit " +SQLLimit, (_err, _data) => {
+        db.executeSql(sql, (_err, _data) => {
+          console.log('new sql: ', sql);
           if(_err) {
             httpMsg.show500(_req, _res, _err);
           } else {
@@ -112,6 +114,7 @@ module.exports = (_app) => {
       "camp_desc" : (_req.body.camp_desc)?_req.body.camp_desc:'',
       "landing_page_url" : (_req.body.landing_page_url)?_req.body.landing_page_url:'',
       "remark" : (_req.body.remark)?_req.body.remark:'',
+			"org_id": (_req.body.org_id)?_req.body.org_id:'',
       "inserted_on": (_req.body.inserted_on)?_req.body.inserted_on: '',
       "updated_on": (_req.body.updated_on)?_req.body.updated_on: '',
       "inserted_by" : (_req.body.inserted_by)?_req.body.inserted_by:1,
@@ -125,10 +128,10 @@ module.exports = (_app) => {
       let sql = '';
       let msg = '';
       if(id == ''){
-        sql = "INSERT INTO campaign (title, camp_desc, landing_page_url, remark, inserted_on, inserted_by, ip, status) VALUES ('"+camp.title+"', '"+camp.camp_desc+"', '"+camp.landing_page_url+"', '"+camp.remark+"', now(),'"+camp.inserted_by+"','"+camp.ip+"', '"+camp.status+"')";
+        sql = "INSERT INTO campaign (title, camp_desc, landing_page_url, remark, inserted_on, inserted_by, ip, status, org_id) VALUES ('"+camp.title+"', '"+camp.camp_desc+"', '"+camp.landing_page_url+"', '"+camp.remark+"', now(),'"+camp.inserted_by+"','"+camp.ip+"', '"+camp.status+"', '"+camp.org_id+"')";
         msg = "Successfully Inserted";
       }else{
-        sql = "UPDATE campaign SET title = '"+camp.title+"', camp_desc = '"+camp.camp_desc+"', landing_page_url = '"+camp.landing_page_url+"', remark = '"+camp.remark+"', updated_on = now(), updated_by = '"+camp.updated_by+"' WHERE id = '"+_req.body.id+"'";
+        sql = "UPDATE campaign SET title = '"+camp.title+"', camp_desc = '"+camp.camp_desc+"', landing_page_url = '"+camp.landing_page_url+"', remark = '"+camp.remark+"', updated_on = now(), updated_by = '"+camp.updated_by+"', org_id = '"+camp.org_id+"' WHERE id = '"+_req.body.id+"'";
         msg = "Successfully Updated";
       }
       console.log('SQL', sql);

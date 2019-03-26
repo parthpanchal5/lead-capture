@@ -15,21 +15,22 @@ module.exports = (_app) => {
     var SQLLimit = skip + ',' + result.limit;
 
 		var filterSql = (_req.query.title) ? ' and p.title LIKE "% ' + _req.query.title + '%"' : '';
-    filterSql += (_req.query.org_id) ? ' and p.org_id = "' + _req.query.org_id + '"' : '';
-
+		filterSql += (_req.query.campaign_id) ? ' and p.campaign_id= "' + _req.query.campaign_id + '"' : '';
+		console.log('campaign id: ', _req.query.campaign_id);
 		db.executeSql("SELECT count(p.id) AS total FROM posts AS p WHERE NOT p.status= -1 and not p.status=0"+ filterSql, (_errT, _dataT) => {
 			if(_errT){
 				httpMsg.show500(_req, _res, _errT);
 			} else {
 				if(_dataT && _dataT.length > 0){
  					result.total = _dataT[0].total;
-          result.pages = Math.ceil(result.total / result.limit);				
+          result.pages = Math.ceil(result.total / result.limit);	
         } else {
 					result.total = 0;
           result.pages = 0; 
 				}
-				// console.log("SELECT p.* FROM posts AS p where not p.status=0 and not p.status=-1"+filterSql+" limit " +SQLLimit)
-        db.executeSql("SELECT p.* FROM posts AS p where not p.status=0 and not p.status=-1"+filterSql+" limit " +SQLLimit, (_err, _data) => {
+				var sql = "SELECT p.* FROM posts AS p where not p.status=0 and not p.status=-1"+filterSql+" limit " +SQLLimit;
+        db.executeSql(sql, (_err, _data) => {
+					console.log('post sql: ', sql);
         	if(_err) {
             httpMsg.show500(_req, _res, _err);
           } else {

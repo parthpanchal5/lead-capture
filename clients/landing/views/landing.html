@@ -4,9 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://bootswatch.com/4/litera/bootstrap.min.css">
   <title>Landing</title>
 </head>
 <body>
-  <h2>Hello World</h2>
+  <nav class="navbar navbar-default">
+		<div class="container">
+			<div class="navbar-header">
+				<a href="index.php" class="navbar-brand">My Website</a>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container">
+		<form id="leadForm" class="leadForm">
+			<div class="form-group">
+				<label>Name</label>
+				<input type="text" name="name" class="form-control" value="" placeholder="Name">
+			</div>
+			<div class="form-group">
+				<label>Email</label>
+				<input type="text" name="email" class="form-control" value="" placeholder="Email">
+			</div>
+			<div class="form-group">
+				<label>Message</label>
+				<textarea name="message" class="form-control" placeholder="Message"></textarea> 
+			</div>
+			<br>
+			<button type="submit" name="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
 </body>
 </html>
