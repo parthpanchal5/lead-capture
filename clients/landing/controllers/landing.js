@@ -3,6 +3,7 @@ const db = require('../../../core/db');
 const CF = require('../../../core/commonFun');
 
 exports.LandingController = (_req, _res, next) => {
+	let lead_id = '';
 	let sql = "select id, track_id from posts where not status = -1 and not status = 0 and track_id = '"+_req.query.trackid+"'";
 	if(_req.query.trackid){
 		db.executeSql(sql, (err,data) => {
@@ -17,23 +18,21 @@ exports.LandingController = (_req, _res, next) => {
 						if(err1){
 
 						} else {
-							_res.render('landing/views/landing.html');
+							lead_id = data1.insertId;
+							console.log('Id: ', data1.insertId);
+							_res.render('landing/views/landing.html', {lead_id});
 						}
-					})
-				} else {
-					_res.render('landing/views/landing.html');
-				}
-
+					});
+				} 
 			}
 		})
-	} else {
-		_res.render('landing/views/landing.html');
-	}
+	} 
 };
 
 
 exports.LandingForm = (_req, _res, next) => {
 	var landing = {
+		"lead_id": (_req.body.lead_id)?_req.body.lead_id:'', 
 		"name": (_req.body.name)?_req.body.name:'',
 		"email": (_req.body.email)?_req.body.email:'',
 		"message": (_req.body.message)?_req.body.message:'',
@@ -44,7 +43,7 @@ exports.LandingForm = (_req, _res, next) => {
 		return httpMsg.sendJson(_req, _res, {status: false, message: 'Paramater missing'});
 	} 
 
-	db.executeSql("INSERT INTO enquiry (name, email, message, ip) VALUES ('"+landing.name+"', '"+landing.email+"', '"+landing.message+"', '"+landing.ip+"')", (_err, _data) => {
+	db.executeSql("INSERT INTO enquiry (lead_id, name, email, message, ip) VALUES ('"+landing.lead_id+"' ,'"+landing.name+"', '"+landing.email+"', '"+landing.message+"', '"+landing.ip+"')", (_err, _data) => {
 		if(_err) {
 			httpMsg.show500(_req, _res, _err, "JSON");
 		} else {
@@ -59,5 +58,6 @@ exports.LandingForm = (_req, _res, next) => {
 
 };
 
-var mailRegex = /^([\w-]+(?:\.[\w-]+))@((?:[\w-]+\.)\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+
 // Paste the code here
+
