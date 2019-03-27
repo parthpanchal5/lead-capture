@@ -60,4 +60,4 @@ exports.LandingForm = (_req, _res, next) => {
 };
 
 var mailRegex = /^([\w-]+(?:\.[\w-]+))@((?:[\w-]+\.)\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
-	
+// Paste the code here
