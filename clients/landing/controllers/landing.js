@@ -31,19 +31,26 @@ exports.LandingController = (_req, _res, next) => {
 
 
 exports.LandingForm = (_req, _res, next) => {
+	let sql = '';
 	var landing = {
 		"lead_id": (_req.body.lead_id)?_req.body.lead_id:'', 
 		"name": (_req.body.name)?_req.body.name:'',
 		"email": (_req.body.email)?_req.body.email:'',
+		"phone": (_req.body.phone)?_req.body.phone:'',
 		"message": (_req.body.message)?_req.body.message:'',
+		"status": (_req.body.status)?_req.body.status:1,
 		"ip": CF.getIp(_req)
 	};
 
 	if(landing.name == '' || landing.email == '') {
 		return httpMsg.sendJson(_req, _res, {status: false, message: 'Paramater missing'});
-	} 
-
-	db.executeSql("INSERT INTO enquiry (lead_id, name, email, message, ip) VALUES ('"+landing.lead_id+"' ,'"+landing.name+"', '"+landing.email+"', '"+landing.message+"', '"+landing.ip+"')", (_err, _data) => {
+	} else if(landing.lead_id == '') {
+		sql = "INSERT INTO enquiry (name, email, phone, message, status, inserted_on, ip) VALUES ("+landing.name+"', '"+landing.email+"', '"+landing.phone+"','"+landing.message+"', '"+landing.status+"', now(),'"+landing.ip+"')";
+	} else {
+		sql = "INSERT INTO enquiry (lead_id, name, email, phone, message, status, inserted_on, ip) VALUES ('"+landing.lead_id+"' ,'"+landing.name+"', '"+landing.email+"', '"+landing.phone+"','"+landing.message+"', '"+landing.status+"', now(), '"+landing.ip+"')";
+	}
+	db.executeSql(sql, (_err, _data) => {
+		console.log('SQL: ', sql);
 		if(_err) {
 			httpMsg.show500(_req, _res, _err, "JSON");
 		} else {
@@ -57,7 +64,3 @@ exports.LandingForm = (_req, _res, next) => {
 	});
 
 };
-
-
-// Paste the code here
-
