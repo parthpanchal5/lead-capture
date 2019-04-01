@@ -3,32 +3,57 @@ const db = require('../../../core/db');
 const CF = require('../../../core/commonFun');
 
 exports.LandingController = (_req, _res, next) => {
-	let lead_id = '';
-	let sql = "select id, track_id from posts where not status = -1 and not status = 0 and track_id = '"+_req.query.trackid+"'";
 	if(_req.query.trackid){
+		let sql = "select id, track_id from posts where not status = -1 and not status = 0 and track_id = '"+_req.query.trackid+"'";
 		db.executeSql(sql, (err,data) => {
 			console.log(sql);
 			if(err){
-
+				httpMsg.sendJson(_req, _res, {message: 'Track id not found'});
 			} else {
+				console.log('Session id: ', _req.session);
 				if(data && data.length>0){
-					let sql1 = "insert into lead (post_id, browser, ip, status, inserted_on) values ('"+data[0].id+"','"+_req.headers["user-agent"]+"', '"+CF.getIp(_req)+"',1,now())";
-					db.executeSql(sql1, (err1, data1) => {
-						console.log(sql1);
-						if(err1){
-
-						} else {
-							lead_id = data1.insertId;
-							console.log('Id: ', data1.insertId);
-							_res.render('landing/views/landing.html', {lead_id});
-						}
-					});
+					if(!CF.isset(_req.session.lead_id)){
+						let sql1 = "insert into lead (post_id, browser, ip, status, inserted_on) values ('"+data[0].id+"','"+_req.headers["user-agent"]+"', '"+CF.getIp(_req)+"',1,now())";
+						db.executeSql(sql1, (err1, data1) => {
+							console.log("SQL 1: ",sql1);
+							if(err1){
+								httpMsg.show500(_req, _res, _err, "JSON");
+							} else {
+								lead_id = data1.insertId;
+								_req.session.lead_id = data1.insertId;
+								console.log('Id: ', data1.insertId);
+								_res.render('landing/views/landing.html', {lead_id});	
+							}
+						});
+					}else{
+						_res.render('landing/views/landing.html', {lead_id});
+					}
+					
 				} 
 			}
 		})
-	} 
-};
+	} else {
+		console.log('REQleadid: ', _req.session);
+		if(!CF.isset(_req.session.lead_id)){
 
+			let sql2 = "insert into lead (browser, ip, status, inserted_on) values ('"+_req.headers["user-agent"]+"', '"+CF.getIp(_req)+"',1,now())";
+			db.executeSql(sql2, (err1, data1) => {
+				console.log(sql2);
+				
+				if(err1){
+					httpMsg.sendJson(_req, _res, {status: true, message: 'Fault Params'});
+				} else {
+					lead_id = data1.insertId;
+					_req.session.lead_id = data1.insertId;
+					console.log('req Id: ', data1.insertId);
+					_res.render('landing/views/landing.html', {lead_id});
+				}
+			});
+		}else{
+			_res.render('landing/views/landing.html', {lead_id});
+		}
+	}
+};
 
 exports.LandingForm = (_req, _res, next) => {
 	let sql = '';

@@ -6,7 +6,10 @@ const path = require('path');
 const multiParty = require('connect-multiparty'); 
 const ejs = require('ejs');
 const app = express();
+const session = require('express-session');
+var cookieParser = require('cookie-parser');
 
+app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, }));
@@ -26,6 +29,15 @@ app.use(function(req, res, next) {
     // }
     next();
 });
+
+// Session
+app.use(session ({
+    secret: 'lol',
+    resave: false,
+    saveUninitialized: false,
+    duration: 30 * 60 * 1000,
+    activeDuration: 5 * 60 * 1000,
+}))
 
 // Folder Redirection for ejs template engine
 const clients = express.Router();
