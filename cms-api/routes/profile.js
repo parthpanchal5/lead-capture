@@ -20,7 +20,7 @@ module.exports = (_app) => {
             httpMsg.show500(_req, _res, _err);
           }else {
             if(_data && _data.length > 0){
-              httpMsg.sendJson(_req, _res, { status:true, message:"Successful", data:_data[0] });
+              httpMsg.sendJson(_req, _res, { status:true, message:"Success", data:_data[0] });
             } else {
               httpMsg.sendJson(_req, _res, { status:false, message:"Fail", data:{} });
             }

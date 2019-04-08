@@ -13,7 +13,7 @@ exports.LandingController = (_req, _res, next) => {
 				console.log('Session id: ', _req.session);
 				if(data && data.length>0){
 					if(!CF.isset(_req.session.lead_id)){
-						let sql1 = "insert into lead (post_id, browser, ip, status, inserted_on) values ('"+data[0].id+"','"+_req.headers["user-agent"]+"', '"+CF.getIp(_req)+"',1,now())";
+						let sql1 = "insert into lead (campaign_id, post_id, browser, ip, status, inserted_on) values ('1','"+data[0].id+"','"+_req.headers["user-agent"]+"', '"+CF.getIp(_req)+"',1,now())";
 						db.executeSql(sql1, (err1, data1) => {
 							console.log("SQL 1: ",sql1);
 							if(err1){
@@ -36,7 +36,7 @@ exports.LandingController = (_req, _res, next) => {
 		console.log('REQleadid: ', _req.session);
 		if(!CF.isset(_req.session.lead_id)){
 
-			let sql2 = "insert into lead (browser, ip, status, inserted_on) values ('"+_req.headers["user-agent"]+"', '"+CF.getIp(_req)+"',1,now())";
+			let sql2 = "insert into lead (campaign_id, browser, ip, status, inserted_on) values ('1','"+_req.headers["user-agent"]+"', '"+CF.getIp(_req)+"',1,now())";
 			db.executeSql(sql2, (err1, data1) => {
 				console.log(sql2);
 				

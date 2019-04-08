@@ -36,7 +36,7 @@ module.exports = (_app) => {
             } else {
               result.docs=[];
             }
-            httpMsg.sendJson(_req, _res, { status:true, message:"Successful", data:result });
+            httpMsg.sendJson(_req, _res, { status:true, message:"Success", data:result });
           }
         });
       }
@@ -106,7 +106,7 @@ module.exports = (_app) => {
         if(_err){
           httpMsg.show500(_req, _res, _err);
         } else {
-          httpMsg.sendJson(_req, _res, { status:true, message:"Successful"});
+          httpMsg.sendJson(_req, _res, { status:true, message:"Success"});
         }
       });
     }
@@ -124,7 +124,7 @@ module.exports = (_app) => {
         if(_err){
           httpMsg.show500(_req, _res, _err);
         } else {
-          httpMsg.sendJson(_req, _res, { status:true, message: "Successful" });
+          httpMsg.sendJson(_req, _res, { status:true, message: "Success" });
         }
       });
     }

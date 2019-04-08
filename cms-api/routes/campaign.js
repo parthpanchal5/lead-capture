@@ -14,7 +14,7 @@ module.exports = (_app) => {
     result.limit = parseInt(CF.isset(_req.query.limit)?_req.query.limit:10);
     var skip = (result.page-1)* result.limit;
     var SQLLimit = skip + ',' + result.limit;
-
+    var sw = new SW();
     var filterSql = (_req.query.title) ? ' and c.title LIKE "%' + _req.query.title + '%"' : '';
     filterSql += (_req.query.org_id) ? ' and c.org_id = "' + _req.query.org_id + '"' : '';
     db.executeSql("SELECT count(c.id) AS total FROM campaign AS c WHERE NOT c.status= -1 and not c.status=0"+ filterSql,(_errT,_dataT) => {
@@ -28,21 +28,22 @@ module.exports = (_app) => {
           result.total = 0;
           result.pages = 0; 
         }
-        var sql = "SELECT c.*, (SELECT COUNT(p.id) FROM posts AS p WHERE NOT p.status = -1 AND NOT p.status = 0 AND p.campaign_id = c.id) AS posts FROM campaign as c where not c.status = -1"+filterSql+" order by c.inserted_on desc limit " +SQLLimit;
-        // console.log("SELECT c.* FROM campaign AS c where not c.status=0 and not c.status=-1"+filterSql+" limit " +SQLLimit);
-        db.executeSql(sql, (_err, _data) => {
-          console.log('new sql: ', sql);
-          if(_err) {
+        var sql1 = "SELECT c.*, (SELECT COUNT(p.id) FROM posts AS p WHERE NOT p.status = -1 AND NOT p.status = 0 AND p.campaign_id = c.id) AS posts, (SELECT COUNT(l.id) FROM lead AS l WHERE NOT l.status = -1 AND NOT l.status = 0 AND l.campaign_id = c.id) AS leads  FROM campaign as c where not c.status = -1"+filterSql+" order by c.inserted_on desc limit " +SQLLimit;
+        db.executeSql(sql1,(_err, _data) => {
+          console.log('new sql: ', sql1);
+          if(_err){  
             httpMsg.show500(_req, _res, _err);
-          } else {
+          } else{
               if(_data && _data.length > 0) {
                 result.docs = _data;
               } else {
                 result.docs = [];
               }
-            httpMsg.sendJson(_req, _res, { status: true, message: 'Successful', data:result });
+            
+            httpMsg.sendJson(_req, _res, { status: true, message: 'Success', data:result });
           }
         });
+       
       }
     });
   });
@@ -65,7 +66,32 @@ module.exports = (_app) => {
         }
       });
     }
-  })
+  });
+
+  // For Report on campaign posts
+  _app.get('/campaign-data/:campid', CT.ensureAuthorized, (_req, _res) => {
+    result = {};
+    var campid = (_req.params.campid) ? _req.params.campid : '';
+    if(campid == '') {
+      httpMsg.show403(_req, _res, "ID is missing");
+    } else {
+      let sql3 = "SELECT COUNT(`campaign_id`) as campaign_counts FROM lead WHERE NOT lead.status = -1 AND NOT lead.status = 0 AND lead.campaign_id = '"+campid+"'";
+      db.executeSql(sql3 , (_err, _data) => {
+        console.log("New SQL: ", sql3);
+        if(_err) {
+          httpMsg.show500(_req, _res, _err);
+        } else {
+          if(_data && _data.length > 0) {
+            // Display the data 
+            result.docs = _data;
+          } else {
+            result.docs = [];
+          }
+          httpMsg.sendJson(_req, _res, { status: true, message: 'Success', data:result });
+        }
+      });
+    }
+  });
 
   // For Drop-down and updating results
   _app.get('/campaign/:id', CT.ensureAuthorized, (_req, _res) => {
@@ -179,3 +205,4 @@ module.exports = (_app) => {
     }
   });
 }
+//SELECT (SELECT COUNT(o.id) FROM organization as o) as org_count, (SELECT COUNT(c.id) FROM campaign as c) as camp_count, (SELECT COUNT(p.id) FROM posts as p) as post_count

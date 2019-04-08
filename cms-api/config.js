@@ -9,5 +9,6 @@ module.exports = (_app)=>{
   require("./routes/userGroup")(_app)
   require("./routes/login")(_app)
   require("./routes/change-pass")(_app)
+  require("./routes/dashboard")(_app)
 
 }

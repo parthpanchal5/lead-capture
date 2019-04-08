@@ -40,7 +40,7 @@ module.exports = (_app) => {
             } else {
             	result.docs = [];
             }
-            httpMsg.sendJson(_req, _res, { status: true, message: 'Successfully', data:result });
+            httpMsg.sendJson(_req, _res, { status: true, message: 'Success', data:result });
           }
         });
 			}
@@ -141,7 +141,7 @@ module.exports = (_app) => {
 					httpMsg.show500(_req, _res, _cerr, "JSON");
 				} else {
 					if(!_cdata && _cdata.length > 0) {
-						httpMsg.sendJson(_req, _res, { status: false, message:"tracking id already exist" });
+						httpMsg.sendJson(_req, _res, { status: false, message:"Tracking id already exist" });
 					} else {
 						let sql = '';
 						let msg = '';
@@ -177,7 +177,7 @@ module.exports = (_app) => {
         if(_err){
           httpMsg.show500(_req, _res, _err);
         } else {
-          httpMsg.sendJson(_req, _res, { status:true, message:"Successfully"});
+          httpMsg.sendJson(_req, _res, { status:true, message:"Success"});
         }
       });
     }
@@ -194,7 +194,7 @@ module.exports = (_app) => {
 				if(_err){
 					httpMsg.show500(_req, _res, _err);
 				} else {
-					httpMsg.sendJson(_req, _res, { status:true, message: "Successful" });
+					httpMsg.sendJson(_req, _res, { status:true, message: "Success" });
 				}
 			});
 		}
