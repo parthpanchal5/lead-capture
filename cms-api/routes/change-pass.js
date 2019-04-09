@@ -9,17 +9,17 @@ module.exports = (_app) => {
   	let oldPass = CF.isset(_req.body.oldPass)? _req.body.oldPass : '';
     let newPass = CF.isset(_req.body.newPass)? _req.body.newPass : '';
 
-      console.log("incrr : ",crypto.createHash('md5').update(oldPass).digest('hex'))
+    // console.log("incrr : ",crypto.createHash('md5').update(oldPass).digest('hex'))
 		if(oldPass == '' || newPass == ''){
 			httpMsg.show400(_req, _res, "Parameter is missing", "JSON");
-		}else {
+		} else {
 
-      console.log("before password : ",oldPass,newPass)
+      // console.log("before password : ",oldPass,newPass);
 	    oldPass = crypto.createHash('md5').update(oldPass).digest('hex');
 	    newPass = crypto.createHash('md5').update(newPass).digest('hex');
 
-      console.log("after password : ",oldPass,newPass)
-      console.log("password : ",oldPass,_req.userData.password)
+      // console.log("after password : ",oldPass,newPass);
+      // console.log("password : ",oldPass,_req.userData.password);
 	    if(_req.userData.password == oldPass){
         db.executeSql("UPDATE admin SET `password` = '"+newPass+"' WHERE `id` = '"+_req.userData.id+"'", (_err1, _data1) => {
           if(_err1){

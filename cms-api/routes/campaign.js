@@ -39,7 +39,6 @@ module.exports = (_app) => {
               } else {
                 result.docs = [];
               }
-            
             httpMsg.sendJson(_req, _res, { status: true, message: 'Success', data:result });
           }
         });
@@ -53,7 +52,6 @@ module.exports = (_app) => {
     if(orgid == '0') {
       httpMsg.show403(_req, _res, "Id is missing");
     } else {
-      // console.log("SELECT id, title FROM campaign WHERE NOT status = -1 and NOT status = 0 and org_id = '"+orgid+"'")
       db.executeSql("SELECT id, title FROM campaign WHERE NOT status = -1 and NOT status = 0 and org_id = '"+orgid+"'", (_err, _data) => {
         if(_err){
           httpMsg.show500(_req, _res, _err, "JSON");
@@ -77,7 +75,7 @@ module.exports = (_app) => {
     } else {
       let sql3 = "SELECT COUNT(`campaign_id`) as campaign_counts FROM lead WHERE NOT lead.status = -1 AND NOT lead.status = 0 AND lead.campaign_id = '"+campid+"'";
       db.executeSql(sql3 , (_err, _data) => {
-        console.log("New SQL: ", sql3);
+        // console.log("New SQL: ", sql3);
         if(_err) {
           httpMsg.show500(_req, _res, _err);
         } else {
@@ -160,7 +158,7 @@ module.exports = (_app) => {
         sql = "UPDATE campaign SET title = '"+camp.title+"', camp_desc = '"+camp.camp_desc+"', landing_page_url = '"+camp.landing_page_url+"', remark = '"+camp.remark+"', updated_on = now(), updated_by = '"+camp.updated_by+"', org_id = '"+camp.org_id+"' WHERE id = '"+_req.body.id+"'";
         msg = "Successfully Updated";
       }
-      console.log('SQL', sql);
+      // console.log('SQL', sql);
       db.executeSql(sql, (_err, _data) => {
         if(_err){
           httpMsg.show500(_req, _res, _err, "JSON");
@@ -178,7 +176,7 @@ module.exports = (_app) => {
       httpMsg.show403(_req, _res, "Id is missing");
     } else {
       db.executeSql("UPDATE campaign SET status = -1, updated_on = now() WHERE id = '" + _req.params.id + "'", (_err, _data) => {
-        console.log('Status Updated', _data);
+        // console.log('Status Updated', _data);
         if(_err){
           httpMsg.show500(_req, _res, _err);
         } else {
@@ -205,4 +203,3 @@ module.exports = (_app) => {
     }
   });
 }
-//SELECT (SELECT COUNT(o.id) FROM organization as o) as org_count, (SELECT COUNT(c.id) FROM campaign as c) as camp_count, (SELECT COUNT(p.id) FROM posts as p) as post_count

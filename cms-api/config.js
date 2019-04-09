@@ -10,5 +10,6 @@ module.exports = (_app)=>{
   require("./routes/login")(_app)
   require("./routes/change-pass")(_app)
   require("./routes/dashboard")(_app)
-
+  require("./routes/camp-chart")(_app)
+  require("./routes/post-chart")(_app)
 }

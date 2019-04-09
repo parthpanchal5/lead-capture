@@ -9,14 +9,14 @@ module.exports = (_app) => {
 
   	// Get all campaigns
   	_app.post('/login', (_req, _res) => {
-  		console.log("body : ",_req.body)
-    	const email = CF.isset(_req.body.email)? _req.body.email : '';
+  		// console.log("body : ",_req.body)
+		const email = CF.isset(_req.body.email)? _req.body.email : '';
 		const password = CF.isset(_req.body.password)? _req.body.password : '';
 		if(email == '' || password == ''){
 			httpMsg.show400(_req, _res, "Parameter is missing", "JSON");
 		} else {
       const pwd = crypto.createHash('md5').update(password).digest('hex');
-      console.log("hello : ",pwd);
+      // console.log("hello : ",pwd);
 	    db.executeSql("SELECT `id`, `name`, `email`, `password`, `photo` FROM admin WHERE email = '"+email+"'",(_err1, _data1) => {
 	    	if(_err1){
 	    		httpMsg.show500(_req, _res, _err1, "JSON");
