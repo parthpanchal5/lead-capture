@@ -193,7 +193,7 @@ module.exports = (_app) => {
       httpMsg.show403(_req, _res, "Id is missing");
     } else {
       db.executeSql("UPDATE campaign SET status = '"+status+"', updated_on = now() WHERE id = '" + _req.params.id + "'", (_err, _data) => {
-        console.log('Status Updated', _data);
+        // console.log('Status Updated', _data);
         if(_err){
           httpMsg.show500(_req, _res, _err);
         } else {

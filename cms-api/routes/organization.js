@@ -106,7 +106,7 @@ module.exports = (_app) => {
         if(_err){
           httpMsg.show500(_req, _res, _err);
         } else {
-          httpMsg.sendJson(_req, _res, { status:true, message:"Success"});
+          httpMsg.sendJson(_req, _res, { status:true, message:"Successfully"});
         }
       });
     }

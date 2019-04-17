@@ -14,6 +14,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true, }));
 app.use(multiParty());
+app.use("/", express.static(path.join(__dirname, 'public')));
 
 // Template engine
 app.set('views', path.join(__dirname, 'clients'));

@@ -9,10 +9,10 @@ module.exports = (_app) => {
 	let result = {};
 	const sw = new SW();
 	_app.get('/post-chart/:id', CT.ensureAuthorized, (_req, _res) => {
-    sw.Sync("leadCount",(rcb) => {db.executeSql("SELECT COUNT(l.id) as leads, DATE_FORMAT(l.inserted_on, '%Y-%m-%d') as inDate FROM `lead` as l WHERE l.post_id = '"+_req.params.id+ "' group BY DATE_FORMAT(l.inserted_on, '%Y-%m-%d')", rcb)},(_err, _data) => {
+    sw.Sync("leadCount",(rcb) => {db.executeSql("SELECT COUNT(l.id) as leads, DATE_FORMAT(l.inserted_on, '%d-%M-%y') as inDate FROM `lead` as l WHERE l.post_id = '"+_req.params.id+ "' group BY DATE_FORMAT(l.inserted_on, '%d-%M-%y')", rcb)},(_err, _data) => {
       if(!_err){
 				if(_data && _data.length > 0) {
-					console.log("date lead : ",_data)
+					// console.log("date lead : ",_data);
 					result.leads = _data;
 				} else {
 					result.leads= [];
@@ -21,10 +21,10 @@ module.exports = (_app) => {
 			}
 		});
 
-		sw.Sync("enquiryCount",(rcb) => {db.executeSql("SELECT COUNT(e.id) as enquiries, DATE_FORMAT(e.inserted_on, '%Y-%m-%d') as inDate FROM `enquiry` as e INNER JOIN lead as l1 on l1.id = e.lead_id WHERE l1.post_id = '"+_req.params.id+"' group BY DATE_FORMAT(e.inserted_on, '%Y-%m-%d')", rcb)},(_err, _data) => {
+		sw.Sync("enquiryCount",(rcb) => {db.executeSql("SELECT COUNT(e.id) as enquiries, DATE_FORMAT(e.inserted_on, '%d-%M-%y') as inDate FROM `enquiry` as e INNER JOIN lead as l1 on l1.id = e.lead_id WHERE l1.post_id = '"+_req.params.id+"' group BY DATE_FORMAT(e.inserted_on, '%d-%M-%y')", rcb)},(_err, _data) => {
       if(!_err){
 				if(_data && _data.length > 0) {
-					console.log("date enquiry : ",_data)
+					// console.log("date enquiry : ",_data);
 					result.enquiries = _data;
 				} else {
 					result.enquiries= [];
@@ -58,7 +58,7 @@ module.exports = (_app) => {
 						};
 					}
 				}
-				console.log("date : ",tempData)
+				// console.log("date : ",tempData);
 				httpMsg.sendJson(_req, _res, { status: true, message: 'Success', data:tempData });
 			}
 		})
